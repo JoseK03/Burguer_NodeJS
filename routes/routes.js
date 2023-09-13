@@ -32,5 +32,19 @@ router.get('/ejercicio1',async (req,res)=>{
     }
 })
 
+//? Econtrar todas las hamburguesas con categoria 'Vegetariana'
 
+router.get('/ejercicio2',async (req,res)=>{
+    try {
+        const client = new MongoClient(bases);
+        await client.connect();
+        const db = client.db(nombreBase);
+        const collection = db.collection('hamburguesas');
+        const result = await collection.find({categoria:'Vegetariana'}).toArray();
+        res.json(result);
+        client.close();
+    } catch (e) {
+        res.status(500).json('No se encuentra dicha categoria')
+    }
+})
 module.exports = router
