@@ -202,6 +202,18 @@ router.get('/ejercicio14',async (req,res)=>{
 
 //? -17-Encontrar todas las categorías que contienen la palabra “gourmet” en su descripción
 
+router.get('/ejercicio17',async (req,res)=>{
+    try {
+        const client = new MongoClient(bases);
+        await client.connect();
+        const db = client.db(nombreBase);
+        const collection = db.collection('categorias');
+        const result = await collection.find({descripcion:{$regex:/gourmet/i}}).toArray()
+        res.json(result);
+    } catch (e) {
+        res.status(500).json('Not found')
+    }
+})
 
 //? -18-Eliminar las hamburguesas que contienen menos de 5 ingredientes
 
