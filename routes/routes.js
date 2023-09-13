@@ -47,4 +47,22 @@ router.get('/ejercicio2',async (req,res)=>{
         res.status(500).json('No se encuentra dicha categoria')
     }
 })
+
+//? Encontrar todos los chefs que se especializan en 'Carnes'
+
+router.get('/ejercicio3',async(req,res)=>{
+     try {
+        const client = new MongoClient(bases);
+        await client.connect();
+        const db = client.db(nombreBase);
+        const collection = db.collection('chefs');
+        const result = await collection.find({especialidad:'Carnes'}).toArray();
+        res.json(result);
+        client();
+     } catch (e) {
+        res.status(500).json('No se han encontrado Chefs con esta especialidad')
+     }
+})
+
+
 module.exports = router
