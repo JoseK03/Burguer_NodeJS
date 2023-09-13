@@ -148,6 +148,18 @@ router.get('/ejercicio9',async(req,res)=>{
 
 //? -11-Encontrar el ingrediente más caro
 
+router.get('/ejercicio11',async (req,res)=>{
+    try {
+        const client = new MongoClient(bases);
+        await client.connect();
+        const db = client.db(nombreBase);
+        const collection = db.collection('ingredientes');
+        const result = await collection.find().sort({precio: -1}).limit(1).toArray();
+        res.json(result);
+    } catch (e) {
+        res.status(500).json('Not found');
+    }
+})
 
 //? -12-Encontrar las hamburguesas que no contienen “Queso cheddar” como ingrediente
 
