@@ -130,7 +130,18 @@ router.get('/ejericico8',async (req,res)=>{
 
 //? -9.-Encontrar todas las hamburguesas que contienen “Pan integral” como ingrediente
 
-
+router.get('/ejercicio9',async(req,res)=>{
+    try {
+        const client = new MongoClient(bases);
+        await client.connect();
+        const db = client.db(nombreBase);
+        const collection = db.collection('hamburguesas');
+        const result = await collection.find({ingredientes:'Pan integral'}).toArray();
+        res.json(result);
+    } catch (e) {
+        res.status(500).json('Not Found')
+    }
+})
 
 //? -10-Cambiar la especialidad del “ChefC” a “Cocina Internacional”
 
