@@ -65,4 +65,18 @@ router.get('/ejercicio3',async(req,res)=>{
 })
 
 
+//? Aumentar en 1.5 el precio de todos los ingredientes
+
+router.put('/ejercicio4', async(req,res)=>{
+    try {
+        const client = new MongoClient(bases);
+        await client.connect();
+        const db = client.db(nombreBase);
+        const collection = db.collection('ingredientes');
+        const result = await collection
+    } catch (e) {
+        res.status(500).json('No found')
+    }
+})
+
 module.exports = router
