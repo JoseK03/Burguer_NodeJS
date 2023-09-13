@@ -163,6 +163,18 @@ router.get('/ejercicio11',async (req,res)=>{
 
 //? -12-Encontrar las hamburguesas que no contienen “Queso cheddar” como ingrediente
 
+router.get('/ejercicio12',async (req,res)=>{
+    try {
+        const client = new MongoClient(bases);
+        await client.connect();
+        const db = client.db(nombreBase);
+        const collection = db.collection('hamburguesas');
+        const result = await collection.find({$nor:[{ingredientes:'Queso cheddar'}]}).toArray();
+        res.json(result);
+    } catch (e) {
+        res.status(500).json('Not found')
+    }
+})
 
 //? -13-Incrementar el stock de “Pan” en 100 unidades
 
