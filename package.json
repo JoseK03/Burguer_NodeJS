@@ -1,0 +1,17 @@
+{
+  "name": "burguer_nodejs",
+  "version": "1.0.0",
+  "description": "Link del ejercicio : https://jungle-nectarine-cef.notion.site/D-V1-Hamburgueser-a-1b9ab1186ed84bcab1890041e16e469b",
+  "main": "index.js",
+  "scripts": {
+    "start":"nodemon index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "mongodb": "^6.0.0",
+    "nodemon": "^3.0.1"
+  }
+}
