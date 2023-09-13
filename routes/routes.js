@@ -224,14 +224,39 @@ router.get('/ejercicio17',async (req,res)=>{
 //? -20-Listar las hamburguesas en orden ascendente según su precio
 
 
+
 //? -21-Encontrar todos los ingredientes cuyo precio sea entre $2 y $5
 
+router.get('/ejercicio21',async(req,res)=>{
+    try {
+        const client = new MongoClient(bases);
+        await client.connect();
+        const db = client.db(nombreBase);
+        const collection = db.collection('ingredientes');
+        const result = await collection.find({precio:{$gte:2 , $lt:5}}).toArray();
+        res.json(result)
+    } catch (e) {
+        res.status(500).json('Not found')
+    }
+})
 
 //? -22-Actualizar la descripción del “Pan” a “Pan fresco y crujiente”
 
 
 //? -23-Encontrar todas las hamburguesas que contienen “Tomate” o “Lechuga” como ingredientes
 
+router.get('/ejercicio23',async(req,res)=>{
+    try {
+        const client = new MongoClient(bases);
+        await client.connect();
+        const db = client.db(nombreBase);
+        const collection = db.collection('hamburguesas');
+        const result = await collection.find({$or:[{ingredientes:'Tomate'},{ingredientes:'Lechuga'}]}).toArray();
+        res.json(result)
+    } catch (e) {
+        res.status(500).json('Not found')
+    }
+})
 
 //? -24-Listar todos los chefs excepto “ChefA”
 
@@ -243,6 +268,7 @@ router.get('/ejercicio17',async (req,res)=>{
 
 
 //? -27-Encontrar la hamburguesa más cara
+
 
 
 //? -28-Agregar “Pepinillos” a todas las hamburguesas de la categoría “Clásica”
