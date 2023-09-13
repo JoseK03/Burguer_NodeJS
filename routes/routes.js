@@ -181,6 +181,18 @@ router.get('/ejercicio12',async (req,res)=>{
 
 //? -14-Encontrar todos los ingredientes que tienen una descripción que contiene la palabra “clásico”
 
+router.get('/ejercicio14',async (req,res)=>{
+    try {
+        const client = new MongoClient(bases);
+        await client.connect();
+        const db = client.db(nombreBase);
+        const collection = db.collection('ingredientes');
+        const result = await collection.find({descripcion:{$regex:/clásico/i}}).toArray();
+        res.json(result);
+    } catch (e) {
+        res.status(500).json('Not found');
+    }
+})
 
 //? -15-Listar las hamburguesas cuyo precio es menor o igual a $9
 

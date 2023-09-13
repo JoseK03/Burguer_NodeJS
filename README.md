@@ -5,5 +5,5 @@
  ---
 
  * Endpoint #12: Se utilizó el operador $nor El cual nos ayuda a realizar una busqueda donde el parametro sea inexistente o nulo
- 
+ * .find({descripcion:{$regex:/clásico/i}}).toArray() => $regex nos ayuda a mirar si se contiene la palabra parametro y la (i) hace insensible la busqueda a mayusculas o minusculas
     
