@@ -58,7 +58,7 @@ router.get('/ejercicio3',async(req,res)=>{
         const collection = db.collection('chefs');
         const result = await collection.find({especialidad:'Carnes'}).toArray();
         res.json(result);
-        client();
+        client.close();
      } catch (e) {
         res.status(500).json('No se han encontrado Chefs con esta especialidad')
      }
@@ -105,6 +105,7 @@ router.get('/ejercicio6',async (req,res)=>{
         const collection = db.collection('categorias');
         const result = await collection.find().toArray();
         res.json(result);
+        client.close();
     } catch (e) {
         res.status(500).json('Not Found')
     }
@@ -123,6 +124,8 @@ router.get('/ejericico8',async (req,res)=>{
         const collection = db.collection('hamburguesas');
         const result = await collection.find().toArray();
         res.json(result);
+        client.close();
+
     } catch (e) {
         res.status(500).json('Not found')
     }
@@ -138,6 +141,8 @@ router.get('/ejercicio9',async(req,res)=>{
         const collection = db.collection('hamburguesas');
         const result = await collection.find({ingredientes:'Pan integral'}).toArray();
         res.json(result);
+        client.close();
+
     } catch (e) {
         res.status(500).json('Not Found')
     }
@@ -156,6 +161,8 @@ router.get('/ejercicio11',async (req,res)=>{
         const collection = db.collection('ingredientes');
         const result = await collection.find().sort({precio: -1}).limit(1).toArray();
         res.json(result);
+        client.close();
+
     } catch (e) {
         res.status(500).json('Not found');
     }
@@ -171,6 +178,7 @@ router.get('/ejercicio12',async (req,res)=>{
         const collection = db.collection('hamburguesas');
         const result = await collection.find({$nor:[{ingredientes:'Queso cheddar'}]}).toArray();
         res.json(result);
+        client.close();
     } catch (e) {
         res.status(500).json('Not found')
     }
@@ -189,6 +197,7 @@ router.get('/ejercicio14',async (req,res)=>{
         const collection = db.collection('ingredientes');
         const result = await collection.find({descripcion:{$regex:/clásico/i}}).toArray();
         res.json(result);
+        client.close();
     } catch (e) {
         res.status(500).json('Not found');
     }
@@ -210,6 +219,7 @@ router.get('/ejercicio17',async (req,res)=>{
         const collection = db.collection('categorias');
         const result = await collection.find({descripcion:{$regex:/gourmet/i}}).toArray()
         res.json(result);
+        client.close();
     } catch (e) {
         res.status(500).json('Not found')
     }
@@ -235,6 +245,8 @@ router.get('/ejercicio21',async(req,res)=>{
         const collection = db.collection('ingredientes');
         const result = await collection.find({precio:{$gte:2 , $lt:5}}).toArray();
         res.json(result)
+        client.close();
+
     } catch (e) {
         res.status(500).json('Not found')
     }
@@ -253,6 +265,7 @@ router.get('/ejercicio23',async(req,res)=>{
         const collection = db.collection('hamburguesas');
         const result = await collection.find({$or:[{ingredientes:'Tomate'},{ingredientes:'Lechuga'}]}).toArray();
         res.json(result)
+        client.close();
     } catch (e) {
         res.status(500).json('Not found')
     }
@@ -269,7 +282,19 @@ router.get('/ejercicio23',async(req,res)=>{
 
 //? -27-Encontrar la hamburguesa más cara
 
-
+router.get('/ejercicio27',async (req,res)=>{
+    try {
+        const client = new MongoClient(bases);
+        await client.connect();
+        const db = client.db(nombreBase);
+        const collection = db.collection('hamburguesas');
+        const result = await collection.find().sort({precio:-1}).limit(1).toArray();
+        res.json(result);
+        client.close();
+    } catch (e) {
+        res.status(500).json('Not found')
+    }
+})
 
 //? -28-Agregar “Pepinillos” a todas las hamburguesas de la categoría “Clásica”
 
