@@ -115,6 +115,18 @@ router.get('/ejercicio6',async (req,res)=>{
 
 //? -8.-Agregar un nuevo ingrediente a la hamburguesa “Clásica”
 
+router.get('/ejericico8',async (req,res)=>{
+    try {
+        const client = new MongoClient(bases);
+        await client.connect();
+        const db = client.db(nombreBase);
+        const collection = db.collection('hamburguesas');
+        const result = await collection.find().toArray();
+        res.json(result);
+    } catch (e) {
+        res.status(500).json('Not found')
+    }
+})
 
 //? -9.-Encontrar todas las hamburguesas que contienen “Pan integral” como ingrediente
 
