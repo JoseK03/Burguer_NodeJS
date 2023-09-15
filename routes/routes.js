@@ -111,8 +111,22 @@ router.get('/ejercicio6',async (req,res)=>{
     }
 })
 
-//? -7.-liminar todos los ingredientes que tengan un stock de 0
+//? -7.-Eliminar todos los ingredientes que tengan un stock de 0
 
+    router.get('/ejericicio7',async(req,res)=>{
+        try {
+            const client = new MongoClient(bases);
+            await client.connect();
+            const db = client.db(nombreBase);
+            const collection = db.collection('ingredientes');
+            const result = await collection.deleteMany({stock:0})  //todo => Esto hara que nos borre todos los elementos que cumplan con el parametro
+            return result.deletedCount <= 0 ? console.log(`Se elimaron${result.deletedCount} ingredientes con stcok : 0` ): console.log(`No se encontraron ingredientes con stock : 0 para eliminar`);
+        } catch (e) {
+            res.status(500).json('Not found');
+        }finally{
+            await client.close();
+        }
+    })
 
 //? -8.-Agregar un nuevo ingrediente a la hamburguesa “Clásica”
 
