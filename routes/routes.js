@@ -164,6 +164,21 @@ router.get('/ejercicio9',async(req,res)=>{
 
 //? -10-Cambiar la especialidad del “ChefC” a “Cocina Internacional”
 
+router.update('/ejercicio10',async(req,res)=>{
+    try {
+        const client = new MongoClient(bases);
+        await client.connect();
+        const db = client.db(nombreBase);
+        const collection = db.collection('chefs');
+        const filtro = {nombre :'ChefC'};
+        const cambio = { $set: {especialidad : 'Cocina Internacional'}}
+        const result = await collection.updateOne(filtro, cambio)
+    }catch (e){
+        res.status(500).json({error:'Error interno del servicio'})
+    }finally{
+        await client.close()
+    }
+})
 
 //? -11-Encontrar el ingrediente más caro
 
