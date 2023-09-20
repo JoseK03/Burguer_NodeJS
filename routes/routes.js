@@ -255,6 +255,20 @@ router.get('/ejercicio14',async (req,res)=>{
 
 //? -15-Listar las hamburguesas cuyo precio es menor o igual a $9
 
+router.get('/ejercicio15',async(req,res)=>{
+    try {
+        const client = new MongoClient(bases);
+        await client.connect();
+        const db = client.db(nombreBase);
+        const collection = db.collection('hamburguesas');
+        const result = await collection.find({precio: {$lte:9}}).toArray();
+        result.length > 0 ? res.json(result) : res.status(404).json({error: 'No se encontraron hamburguesas con precio menor o igual a 9'})
+    } catch (e) {
+        res.status(500).json({error:'Error interno en el servidor'})
+    }finally{
+        await client.close()
+    }
+})
 
 //? -16-Contar cuántos chefs hay en la base de datos
 
