@@ -164,7 +164,7 @@ router.get('/ejercicio9',async(req,res)=>{
 
 //? -10-Cambiar la especialidad del “ChefC” a “Cocina Internacional”
 
-router.update('/ejercicio10',async(req,res)=>{
+router.put('/ejercicio10',async(req,res)=>{
     try {
         const client = new MongoClient(bases);
         await client.connect();
@@ -214,6 +214,27 @@ router.get('/ejercicio12',async (req,res)=>{
 })
 
 //? -13-Incrementar el stock de “Pan” en 100 unidades
+
+router.put('/ejercicio13',async(req,res) =>{
+    try {
+        const client = new MongoClient(bases);
+        await client.connect();
+        const db = client.db(nombreBase);
+        const collection = db.collection('ingredientes');
+        const filtro = {nombre: 'Pan'};
+        const actualizacion = {$inc:{stock:100}};
+        const result = await collection.updateOne(filtro,actualizacion)
+        if (result.modifiedCount > 0) {
+            res.json({ message: 'Stock de "Pan" incrementado en 100 unidades.' });
+        } else {
+            res.status(404).json({ error: 'No se encontró el ingrediente "Pan".' });
+        }
+    } catch (e) {
+        res.status(500).json({error:'Error interno en el servidor'})
+    }finally{
+        await client.close()
+    }
+})
 
 
 //? -14-Encontrar todos los ingredientes que tienen una descripción que contiene la palabra “clásico”
