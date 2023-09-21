@@ -1,5 +1,6 @@
 const express = require('express');
 const {MongoClient} = require('mongodb');
+const cli = require('nodemon/lib/cli');
 
 require('dotenv').config();
 const router = express.Router();
@@ -272,6 +273,21 @@ router.get('/ejercicio15',async(req,res)=>{
 
 //? -16-Contar cuántos chefs hay en la base de datos
 
+router.get('/ejercicio16',async(req,res)=>{
+    const client = new MongoClient(bases);
+    try {
+         await client.connect();
+         const db = client.db(nombreBase);
+         const collection = db.collection('chefs');
+         const result = await collection.countDocuments();
+         res.json({result});
+    } catch (e) {
+        res.status(500).json({error:'Error interno en el servidor'});
+    }finally{
+        await client.close()
+    }
+})
+
 
 //? -17-Encontrar todas las categorías que contienen la palabra “gourmet” en su descripción
 
@@ -290,6 +306,33 @@ router.get('/ejercicio17',async (req,res)=>{
 })
 
 //? -18-Eliminar las hamburguesas que contienen menos de 5 ingredientes
+
+router.delete('/ejercicio18',async(req, res)=>{
+    const client = new MongoClient(bases);
+    try {
+        await client.connect();
+        const db = client.db(nombreBase);
+        const collection = db.collection('hamburguesas');
+        const hamburguesaDelete = await collection.deleteMany({
+            $expr: {
+                $lt: [
+                    {
+                        $size: "$ingredientes"
+                    }, 5
+                ]
+            }
+        });
+        if (hamburguesaDelete.deletedCount > 0) {
+            res.json({type: 'Success', data: hamburguesaDelete});
+        }else{
+            res.json({type: 'Error',message: 'No hay hamburguesas a eliminar' })
+        }
+    } catch (error) {
+        
+    }finally{
+        client.close();
+    }
+})
 
 
 //? -19-Agregar un nuevo chef a la colección con una especialidad en “Cocina Asiática”
