@@ -393,6 +393,22 @@ router.get('/ejercicio21',async(req,res)=>{
 
 //? -22-Actualizar la descripción del “Pan” a “Pan fresco y crujiente”
 
+router.put('/ejercicio22/',async(req,res)=>{
+    const client = new MongoClient(bases);
+    try {
+        await client.connect();
+        const db = client.db(nombreBase);
+        const collection = db.collection('ingredientes');
+        const result = await collection.findOneAndUpdate(
+            {nombre:'Pan'},
+            {$set:{descripcion:'Pan fresco y crujiente'}},
+            {returnOriginal:false}
+        );
+        res.json(result)
+    } catch (e) {
+        res.status(500).json({error:'Error interno en el servidor'})
+    }
+})
 
 //? -23-Encontrar todas las hamburguesas que contienen “Tomate” o “Lechuga” como ingredientes
 
