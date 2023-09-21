@@ -462,6 +462,20 @@ router.put('/ejercicio25',async(req,res)=>{
 
 //? -26-Listar todos los ingredientes en orden alfabético
 
+router.get('/ejercicio26',async(req,res)=>{
+    const client = new MongoClient(bases);
+    try {
+        await client.connect();
+        const db = client.db(nombreBase);
+        const collection = db.collection('ingredientes')
+        const result = await collection.find().sort({nombre:1}).toArray()
+        res.json(result)
+    } catch (e) {
+        res.status(500).json({error:'Error interno del servidor'});
+    }finally{
+        await client.close();
+    }
+})
 
 //? -27-Encontrar la hamburguesa más cara
 
@@ -481,8 +495,25 @@ router.get('/ejercicio27',async (req,res)=>{
 
 //? -28-Agregar “Pepinillos” a todas las hamburguesas de la categoría “Clásica”
 
+router.put('/ejercicio28',async(req,res)=>{
+    const client = new MongoClient(bases);
+    try {
+        await client.connect();
+        const db = client.db(nombreBase);
+        const collection = db.collection('hamburguesas')
+        const filtro = {categoria : 'Clásica'};
+        const nuevoIngrediente = {$addToSet:{ingredientes:'Pepinillos'}};
+        const result = await collection.updateMany(filtro,nuevoIngrediente);
+        res.json(result)
+    } catch (e) {
+        res.status(500).json({error:'Error interno del servidor'});
+    }finally{
+        await client.close();
+    }
+})
 
 //? -29-Eliminar todos los chefs que tienen una especialidad en “Cocina Vegetariana”
+
 
 
 //? -30-Encontrar todas las hamburguesas que contienen exactamente 7 ingredientes
