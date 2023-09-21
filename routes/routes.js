@@ -514,16 +514,100 @@ router.put('/ejercicio28',async(req,res)=>{
 
 //? -29-Eliminar todos los chefs que tienen una especialidad en “Cocina Vegetariana”
 
-
+router.delete('/ejercicio29',async(req,res)=>{
+    const client = new MongoClient(bases);
+    try {
+        await client.connect();
+        const db = client.db(nombreBase);
+        const collection = db.collection('chefs');
+        const filtro = {especialidad:'Cocina Vegetariana'};
+        const result = await collection.deleteMany(filtro);
+        result.deletedCount > 0 ? res.json(`Se eliminaro ${result.deletedCount}`): res.json('No se encontraron Chefs con dicha especialidad')
+    } catch (e) {
+        res.status(500).json({error:'Error interno en el servidor'});
+    }finally{
+        await client.close()
+    }
+})
 
 //? -30-Encontrar todas las hamburguesas que contienen exactamente 7 ingredientes
 
-
+router.get('/ejercicio30',async(req,res)=>{
+    const client = new MongoClient(bases);
+    try {
+        await client.connect();
+        const db = client.db(nombreBase);
+        const collection = db.collection('hamburguesas');
+        const filtro = {$expr:{$eq:[{$size:'$ingredientes'},7] }};
+        const result = await collection.find(filtro).toArray();
+        res.json(result)
+    } catch (e) {
+        res.status(500).json({error:'Error interno en el servidor'});
+    }finally{
+        await client.close()
+    }
+})
 //? -31-Encontrar la hamburguesa más cara que fue preparada por un chef especializado en “Gourmet”
 
+router.get('/ejercicio31',async(req,res)=>{
+    const client  = new MongoClient(bases);
+    try {
+        await client.connect();
+        const db = client.db(nombreBase);
+        const collectionHamburguesas = db.collection('hamburguesas');
+        const collectionChefs = db.collection('chefs');
+        const chefGourmet = await collectionChefs.findOne({especialidad:'Gourmet'})
+        const pipeline = [
+            {
+                $match:{ chef: chefGourmet.nombre}
+            },
+            {
+                $sort: {precio: -1}
+            },
+            {
+                $limit: 1
+            }
+        ];
+        const result = await collectionHamburguesas.aggregate(pipeline).toArray()
+        res.json(result)     
+    } catch (e) {
+        res.status(500).json({error:'Error interno en el servidor'});
+    }finally{
+        await client.close()
+    }
+})
 
 //? -32-Listar todos los ingredientes junto con el número de hamburguesas que los contienen
 
+router.get('/ejercicio32',async(req,res)=>{
+    const client = new MongoClient(bases);
+    try {
+        await client.connect();
+        const db = client.db(nombreBase);
+        const collectionHamburguesas = db.collection('hamburguesas');
+        const pipeline = [
+            {
+                $unwind:'$ingredientes'
+            },
+            {
+                $group:{
+                    _id: '$ingredientes',
+                    count: {$sum:1}
+                }
+            },
+            {
+                $sort:{_id:1}
+            }
+        ];
+        const result = await collectionHamburguesas.aggregate(pipeline).toArray();
+        res.json(result)
+
+    } catch (e) {
+        res.status(500).json({error:'Error interno en el servidor'});
+    }finally{
+        await client.close()
+    }
+})
 
 //? -33-Listar los chefs junto con el número de hamburguesas que han preparado
 
