@@ -358,6 +358,20 @@ router.post('/ejercicio19',async(req,res)=>{
 
 //? -20-Listar las hamburguesas en orden ascendente según su precio
 
+router.get('/ejercicio20',async(req,res)=>{
+    const client = new MongoClient(bases);
+    try {
+        await client.connect();
+        const db = client.db(nombreBase);
+        const collection = db.collection('hamburguesas');
+        const result = await collection.find().sort({precio:1}).toArray();
+        res.json(result);
+    } catch (e) {
+        res.status(500).json({error:'Error interno en el servidor'});
+    }finally{
+        await client.close()
+    }
+})
 
 
 //? -21-Encontrar todos los ingredientes cuyo precio sea entre $2 y $5
