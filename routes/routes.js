@@ -337,6 +337,24 @@ router.delete('/ejercicio18',async(req, res)=>{
 
 //? -19-Agregar un nuevo chef a la colección con una especialidad en “Cocina Asiática”
 
+router.post('/ejercicio19',async(req,res)=>{
+    const client = new MongoClient(bases);
+    try {
+        await client.connect();
+        const db = client.db(nombreBase);
+        const collection = db.collection('chefs');
+        const result = await collection.insertOne({
+            nombre:"ChefD",
+            especialidad:"Cocina Asiática"
+        })
+        res.json(result);
+    } catch (e) {
+        res.status(500).json({error:'Error interno en el servidor'})
+    }finally{
+        await client.close();
+    }
+})
+
 
 //? -20-Listar las hamburguesas en orden ascendente según su precio
 
