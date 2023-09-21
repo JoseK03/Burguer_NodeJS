@@ -328,7 +328,7 @@ router.delete('/ejercicio18',async(req, res)=>{
             res.json({type: 'Error',message: 'No hay hamburguesas a eliminar' })
         }
     } catch (error) {
-        
+        res.status(500).json({error:'Error interno en el servidor'})
     }finally{
         client.close();
     }
