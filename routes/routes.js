@@ -428,9 +428,37 @@ router.get('/ejercicio23',async(req,res)=>{
 
 //? -24-Listar todos los chefs excepto “ChefA”
 
+router.get('/ejercicio24',async(req,res)=>{
+    const client = new MongoClient(bases);
+    try {
+        await client.connect();
+        const db = client.db(nombreBase);
+        const collection = db.collection('chefs');
+        const result = await collection.find({nombre:{$ne:'ChefA'}}).toArray();
+        res.json(result);
+    } catch (e) {
+        res.status(500).json({error:'Error interno en el servidor'})
+    }finally{
+        await client.close();
+    }
+})
 
 //? -25-Incrementar en $2 el precio de todas las hamburguesas de la categoría “Gourmet”
 
+router.put('/ejercicio25',async(req,res)=>{
+    const client = new MongoClient(bases);
+    try {
+        await client.connect();
+        const db = client.db(nombreBase);
+        const collection = db.collection('hamburguesas');
+        const filtro = {categoria:'Gourmet'};
+        const modificacion = {$inc:{precio:2}};
+        const result = await collection.updateMany(filtro,modificacion);
+        res.json({result});
+    } catch (e) {
+        res.status(500).json({error:'Error interno en el servidor'})
+    }
+})
 
 //? -26-Listar todos los ingredientes en orden alfabético
 
