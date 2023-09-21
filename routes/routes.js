@@ -611,26 +611,386 @@ router.get('/ejercicio32',async(req,res)=>{
 
 //? -33-Listar los chefs junto con el número de hamburguesas que han preparado
 
+router.get('/ejercicio33', async (req, res) => {
+    const client = new MongoClient(bases);
+    try {
+        await client.connect();
+        const db = client.db(nombreBase);
+        const chefsCollection = db.collection('chefs');
+
+        const pipeline = [
+            {
+                $lookup: {
+                    from: 'hamburguesas', 
+                    localField: 'nombre', 
+                    foreignField: 'chef', 
+                    as: 'hamburguesas' 
+                }
+            },
+            {
+                $project: {
+                    _id: 1, 
+                    nombre: 1, 
+                    especialidad: 1,
+                    numHamburguesas: { $size: '$hamburguesas' } 
+                }
+            },
+            {
+                $sort: { nombre: 1 } 
+            }
+        ];
+
+        const result = await chefsCollection.aggregate(pipeline).toArray();
+
+        res.json(result);
+    } catch (e) {
+        res.status(500).json({ error: 'Error interno en el servidor' });
+    } finally {
+        await client.close();
+    }
+});
+
 
 //? -34-Encuentra la categoría con la mayor cantidad de hamburguesas
+
+router.get('/ejercicio34', async (req, res) => {
+    const client = new MongoClient(bases);
+    try {
+        await client.connect();
+        const db = client.db(nombreBase);
+        const categoriasCollection = db.collection('categorias');
+
+        const pipeline = [
+            {
+                $lookup: {
+                    from: 'hamburguesas', 
+                    localField: 'nombre', 
+                    foreignField: 'categoria', 
+                    as: 'hamburguesas'
+                }
+            },
+            {
+                $project: {
+                    _id: 0, 
+                    nombreCategoria: '$nombre', 
+                    numHamburguesas: { $size: '$hamburguesas'}
+                }
+            },
+            {
+                $sort: { numHamburguesas: -1 } 
+            },
+            {
+                $limit: 1 
+            }
+        ];
+
+        const result = await categoriasCollection.aggregate(pipeline).toArray();
+
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'No se encontraron categorías.' });
+        }
+
+        res.json(result[0]);
+    } catch (e) {
+        res.status(500).json({ error: 'Error interno en el servidor' });
+    } finally {
+        await client.close();
+    }
+});
 
 
 //? -35-Listar todos los chefs y el costo total de ingredientes de todas las hamburguesas que han preparado
 
+router.get('/ejercicio35', async (req, res) => {
+    const client = new MongoClient(bases);
+    try {
+        await client.connect();
+        const db = client.db(nombreBase);
+        const chefsCollection = db.collection('chefs');
+
+        const pipeline = [
+            {
+                $lookup: {
+                    from: 'hamburguesas', 
+                    localField: 'nombre', 
+                    foreignField: 'chef', 
+                    as: 'hamburguesas' 
+                }
+            },
+            {
+                $unwind: '$hamburguesas' 
+            },
+            {
+                $lookup: {
+                    from: 'ingredientes', 
+                    localField: 'hamburguesas.ingredientes', 
+                    foreignField: 'nombre', 
+                    as: 'ingredientes' 
+                }
+            },
+            {
+                $group: {
+                    _id: '$_id', 
+                    nombre: { $first: '$nombre' }, 
+                    costoTotalIngredientes: { $sum: '$ingredientes.precio' } 
+                }
+            },
+            {
+                $sort: { nombre: 1 } 
+            }
+        ];
+
+        const result = await chefsCollection.aggregate(pipeline).toArray();
+
+        res.json(result);
+    } catch (e) {
+        res.status(500).json({ error: 'Error interno en el servidor' });
+    } finally {
+        await client.close();
+    }
+});
+
 
 //? -36-Encontrar todos los ingredientes que no están en ninguna hamburguesa
+
+router.get('/ejercicio36', async (req, res) => {
+    const client = new MongoClient(bases);
+    try {
+        await client.connect();
+        const db = client.db(nombreBase);
+        const ingredientesCollection = db.collection('ingredientes');
+
+        const pipeline = [
+            {
+                $lookup: {
+                    from: 'hamburguesas', 
+                    localField: 'nombre', 
+                    foreignField: 'ingredientes', 
+                    as: 'hamburguesas' 
+                }
+            },
+            {
+                $match: {
+                    hamburguesas: { $size: 0 } 
+                }
+            },
+            {
+                $project: {
+                    _id: 0, 
+                    nombre: 1 
+                }
+            },
+            {
+                $sort: { nombre: 1 } 
+            }
+        ];
+
+        const result = await ingredientesCollection.aggregate(pipeline).toArray();
+
+        res.json(result);
+    } catch (e) {
+        res.status(500).json({ error: 'Error interno en el servidor' });
+    } finally {
+        await client.close();
+    }
+});
 
 
 //? -37-Listar todas las hamburguesas con su descripción de categoría
 
+router.get('/ejercicio37', async (req, res) => {
+    const client = new MongoClient(bases);
+    try {
+        await client.connect();
+        const db = client.db(nombreBase);
+        const hamburguesasCollection = db.collection('hamburguesas');
+        const categoriasCollection = db.collection('categorias');
+
+        const pipeline = [
+            {
+                $lookup: {
+                    from: 'categorias', 
+                    localField: 'categoria', 
+                    foreignField: 'nombre', 
+                    as: 'categoriaInfo' 
+                }
+            },
+            {
+                $project: {
+                    _id: 0, 
+                    nombre: 1, 
+                    descripcionCategoria: '$categoriaInfo.descripcion' 
+                }
+            },
+            {
+                $sort: { nombre: 1 } 
+            }
+        ];
+
+        const result = await hamburguesasCollection.aggregate(pipeline).toArray();
+
+        res.json(result);
+    } catch (e) {
+        res.status(500).json({ error: 'Error interno en el servidor' });
+    } finally {
+        await client.close();
+    }
+});
+
+
 
 //? -38-Encuentra el chef que ha preparado hamburguesas con el mayor número de ingredientes en total
+
+router.get('/ejercicio38', async (req, res) => {
+    const client = new MongoClient(bases);
+    try {
+        await client.connect();
+        const db = client.db(nombreBase);
+        const chefsCollection = db.collection('chefs');
+        const hamburguesasCollection = db.collection('hamburguesas');
+        const ingredientesCollection = db.collection('ingredientes');
+
+        const pipeline = [
+            {
+                $lookup: {
+                    from: 'hamburguesas', 
+                    localField: 'nombre', 
+                    foreignField: 'chef', 
+                    as: 'hamburguesas' 
+                }
+            },
+            {
+                $unwind: '$hamburguesas' 
+            },
+            {
+                $lookup: {
+                    from: 'ingredientes', 
+                    localField: 'hamburguesas.ingredientes', 
+                    foreignField: 'nombre', 
+                    as: 'ingredientes' 
+                }
+            },
+            {
+                $group: {
+                    _id: '$_id', 
+                    nombre: { $first: '$nombre' }, 
+                    totalIngredientes: { $sum: { $size: '$ingredientes' } } 
+                }
+            },
+            {
+                $sort: { totalIngredientes: -1 } 
+            },
+            {
+                $limit: 1
+            }
+        ];
+
+        const result = await chefsCollection.aggregate(pipeline).toArray();
+
+        res.json(result);
+    } catch (e) {
+        res.status(500).json({ error: 'Error interno en el servidor' });
+    } finally {
+        await client.close();
+    }
+});
 
 
 //? -39-Encontrar el precio promedio de las hamburguesas en cada categoría
 
+router.get('/ejercicio39', async (req, res) => {
+    const client = new MongoClient(bases);
+    try {
+        await client.connect();
+        const db = client.db(nombreBase);
+        const hamburguesasCollection = db.collection('hamburguesas');
+
+        const pipeline = [
+            {
+                $lookup: {
+                    from: 'categorias', 
+                    localField: 'categoria', 
+                    foreignField: 'nombre', 
+                    as: 'categoriaInfo' 
+                }
+            },
+            {
+                $group: {
+                    _id: '$categoriaInfo.nombre', 
+                    precioPromedio: { $avg: '$precio' } 
+                }
+            },
+            {
+                $project: {
+                    _id: 0, 
+                    categoria: '$_id', 
+                    precioPromedio: 1 
+                }
+            }
+        ];
+
+        const result = await hamburguesasCollection.aggregate(pipeline).toArray();
+
+        res.json(result);
+    } catch (e) {
+        res.status(500).json({ error: 'Error interno en el servidor' });
+    } finally {
+        await client.close();
+    }
+});
+
 
 //? -40-Listar los chefs y la hamburguesa más cara que han preparado
+
+router.get('/ejercicio40', async (req, res) => {
+    const client = new MongoClient(bases);
+    try {
+        await client.connect();
+        const db = client.db(nombreBase);
+        const chefsCollection = db.collection('chefs');
+        const hamburguesasCollection = db.collection('hamburguesas');
+
+        const pipeline = [
+            {
+                $lookup: {
+                    from: 'Hamburguesas',
+                    localField: 'nombre', 
+                    foreignField: 'chef', 
+                    as: 'hamburguesas'
+                }
+            },
+            {
+                $unwind: '$hamburguesas' 
+            },
+            {
+                $sort: { 'hamburguesas.precio': -1 } 
+            },
+            {
+                $group: {
+                    _id: '$_id', 
+                    nombre: { $first: '$nombre' }, 
+                    hamburguesaMasCara: { $first: '$hamburguesas' } 
+                }
+            },
+            {
+                $project: {
+                    _id: 0, // 
+                    chef: '$nombre', 
+                    hamburguesaMasCara: '$hamburguesaMasCara.nombre', 
+                    precioHamburguesaMasCara: '$hamburguesaMasCara.precio' 
+                }
+            }
+        ];
+
+        const result = await chefsCollection.aggregate(pipeline).toArray();
+
+        res.json(result);
+    } catch (e) {
+        res.status(500).json({ error: 'Error interno en el servidor' });
+    } finally {
+        await client.close();
+    }
+});
 
 
 module.exports = router
